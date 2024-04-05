@@ -17,7 +17,7 @@ function preflight_copy_notebook() {
 
 # Default to false until we can stabilize the update process
 function preflight_update_invokeai() {
-    if [[ ${AUTO_UPDATE,,} == "true" ]]; then
+    if [[ ${AUTO_UPDATE,,} != "false" ]]; then
         /opt/ai-dock/bin/update-invokeai.sh
     else
         printf "Skipping auto update (AUTO_UPDATE=false)"

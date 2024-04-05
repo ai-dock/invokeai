@@ -4,7 +4,7 @@ build_cpu_main() {
     build_cpu_install_invokeai
 }
 
-build_cpu_install_webui() {
+build_cpu_install_invokeai() {
     /opt/ai-dock/bin/update-invokeai.sh
 }
 

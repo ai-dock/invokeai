@@ -86,8 +86,7 @@ function build_extra_start() {
 
     # Invoke has no exit/CI run mode so run it and wait until it's fuly initialised
     cd /opt/invokeai && \
-        micromamba run -n invokeai -e LD_PRELOAD=libtcmalloc.so invokeai-web > /tmp/invoke-ci.log 2>&1 &
-    pid=$!
+        micromamba run -n invokeai -e LD_PRELOAD=libtcmalloc.so invokeai-web 2>&1 | tee /tmp/invoke-ci.log &
     wait_max=30
     wait_current=0
     init_string="Uvicorn running on"
@@ -98,7 +97,7 @@ function build_extra_start() {
         sleep 1
     done
 
-    kill $pid
+    pkill invokeai-web
 
     # Ensure pytorch hasn't been clobbered
     $MAMBA_DEFAULT_RUN python /opt/ai-dock/tests/assert-torch-version.py || exit 1

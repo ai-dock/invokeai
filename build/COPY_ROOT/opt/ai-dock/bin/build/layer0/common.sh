@@ -9,7 +9,7 @@ build_common_main() {
 
 build_common_create_env() {
     apt-get update
-    $APT_INSTALL libgl1 libgoogle-perftools4
+    $APT_INSTALL libgl1 libgoogle-perftools4 python3-opencv libopencv-dev
     ln -sf $(ldconfig -p | grep -Po "libtcmalloc.so.\d" | head -n 1) \
         /lib/x86_64-linux-gnu/libtcmalloc.so
     # A new pytorch env costs ~ 300Mb
