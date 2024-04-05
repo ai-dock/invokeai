@@ -8,9 +8,9 @@ on:
 env:
   UBUNTU_VERSION: 22.04
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-  LATEST_CUDA: "pytorch-2.2.0-py3.10-cuda-11.8.0-runtime-22.04"
-  LATEST_ROCM: "pytorch-2.2.0-py3.10-rocm-5.7-runtime-22.04"
-  LATEST_CPU: "pytorch-2.2.0-py3.10-cpu-22.04"
+  LATEST_CUDA: "pytorch-2.2.1-py3.10-cuda-11.8.0-runtime-22.04"
+  LATEST_ROCM: "pytorch-2.2.1-py3.10-rocm-5.7-runtime-22.04"
+  LATEST_CPU: "pytorch-2.2.1-py3.10-cpu-22.04"
 
 jobs:
   cpu-base:
