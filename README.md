@@ -5,7 +5,7 @@
 Run [Invoke AI](https://github.com/invoke-ai/InvokeAI) in a docker container locally or in the cloud.
 
 >[!NOTE]  
->These images do not bundle models or third-party configurations. You should use a [provisioning script](#provisioning-script) to automatically configure your container. You can find examples in `config/provisioning`.
+>These images do not bundle models or third-party configurations. You should use a [provisioning script](https://github.com/ai-dock/base-image/wiki/4.0-Running-the-Image#provisioning-script) to automatically configure your container. You can find examples in `config/provisioning`.
 
 ## Documentation
 
@@ -52,7 +52,7 @@ Supported Platforms: `NVIDIA CUDA`, `AMD ROCm`, `CPU`
 | ------------------------ | ----------- |
 | `AUTO_UPDATE`            | Update Invoke AI on startup (default `true`) |
 | `INVOKEAI_VERSION`       | InvokeAI version tag (default `None`) |
-| `INVOKEAI_PORT_HOST`     | Web UI port (default `7860`) |
+| `INVOKEAI_PORT_HOST`     | InvokeAI port (default `9090`) |
 | `INVOKEAI_URL`           | Override `$DIRECT_ADDRESS:port` with URL for Invoke AI service |
 | `INVOKEAI_*`             | Invoke AI environment configuration as described in the [project documentation](https://invoke-ai.github.io/InvokeAI/features/CONFIGURATION/#environment-variables) |
 
@@ -77,11 +77,9 @@ The following services will be launched alongside the [default services](https:/
 
 The service will launch on port `9090` unless you have specified an override with `INVOKEAI_PORT_HOST`.
 
-Invoke AI will be updated to the latest version on container start. You can pin the version to a branch or commit hash by setting the `INVOKEAI_BRANCH` variable.
+Invoke AI will be updated to the latest version on container start. You can pin the version to a branch or commit hash by setting the `INVOKEAI_VERSION` variable.
 
-You can set startup flags by using variable `INVOKEAI_FLAGS`.
-
-To manage this service you can use `supervisorctl [start|stop|restart] invokeai`.
+To manage this service you can use `supervisorctl [start|stop|restart] invokeai` or through the [Service Portal](https://github.com/ai-dock/base-image/wiki/1.0-Included-Software#ai-dock-service-portal) process manager tab.
 
 >[!NOTE]
 >All services are password protected by default. See the [security](https://github.com/ai-dock/base-image/wiki#security) and [environment variables](https://github.com/ai-dock/base-image/wiki/2.0-Environment-Variables) documentation for more information.
