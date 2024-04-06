@@ -13,6 +13,8 @@ All AI-Dock containers share a common base which is designed to make running on 
 
 Common features and options are documented in the [base wiki](https://github.com/ai-dock/base-image/wiki) but any additional features unique to this image will be detailed below.
 
+>[!NOTE]  
+>The default provisioning script downloads models to `$WORKSPACE/storage`; You will need to manually scan this directory as symlinks are not yet set for this image.
 
 #### Version Tags
 
@@ -23,29 +25,24 @@ Tags follow these patterns:
 ##### _CUDA_
 - `:pytorch-[pytorch-version]-py[python-version]-cuda-[x.x.x]-base-[ubuntu-version]`
 
-- `:latest-cuda` &rarr; `:pytorch-2.2.0-py3.10-cuda-11.8.0-base-22.04`
-
-- `:latest-cuda-jupyter` &rarr; `:jupyter-pytorch-2.2.0-py3.10-cuda-11.8.0-base-22.04`
+- `:latest-cuda` &rarr; `:pytorch-2.2.1-py3.10-cuda-11.8.0-base-22.04`
 
 ##### _ROCm_
 - `:pytorch-[pytorch-version]-py[python-version]-rocm-[x.x.x]-runtime-[ubuntu-version]`
 
-- `:latest-rocm` &rarr; `:pytorch-2.2.0-py3.10-rocm-5.7-runtime-22.04`
-
-- `:latest-rocm-jupyter` &rarr; `:jupyter-pytorch-2.2.0-py3.10-rocm-5.7-runtime-22.04`
+- `:latest-rocm` &rarr; `:pytorch-2.2.1-py3.10-rocm-5.7-runtime-22.04`
 
 ##### _CPU_
 - `:pytorch-[pytorch-version]-py[python-version]-ubuntu-[ubuntu-version]`
 
-- `:latest-cpu` &rarr; `:pytorch-2.2.0-py3.10-cpu-22.04` 
+- `:latest-cpu` &rarr; `:pytorch-2.2.1-py3.10-cpu-22.04` 
 
-- `:latest-cpu-jupyter` &rarr; `:jupyter-pytorch-2.2.0-py3.10-cpu-22.04` 
 
 Browse [here](https://github.com/ai-dock/invokeai/pkgs/container/invokeai) for an image suitable for your target environment.
 
 Supported Python versions: `3.10`
 
-Supported Pytorch versions: `2.2.0`, `2.1.2`
+Supported Pytorch versions: `2.2.1`
 
 Supported Platforms: `NVIDIA CUDA`, `AMD ROCm`, `CPU`
 
@@ -55,10 +52,9 @@ Supported Platforms: `NVIDIA CUDA`, `AMD ROCm`, `CPU`
 | ------------------------ | ----------- |
 | `AUTO_UPDATE`            | Update Invoke AI on startup (default `true`) |
 | `INVOKEAI_VERSION`       | InvokeAI version tag (default `None`) |
-| `INVOKEAI_FLAGS`         | Startup flags |
 | `INVOKEAI_PORT_HOST`     | Web UI port (default `7860`) |
 | `INVOKEAI_URL`           | Override `$DIRECT_ADDRESS:port` with URL for Invoke AI service |
-| `INVOKEAI_*` ^           | Invoke AI environment configuration as described in the [project documentation](https://invoke-ai.github.io/InvokeAI/features/CONFIGURATION/#environment-variables) |
+| `INVOKEAI_*`             | Invoke AI environment configuration as described in the [project documentation](https://invoke-ai.github.io/InvokeAI/features/CONFIGURATION/#environment-variables) |
 
 See the base environment variables [here](https://github.com/ai-dock/base-image/wiki/2.0-Environment-Variables) for more configuration options.
 
@@ -95,17 +91,13 @@ To manage this service you can use `supervisorctl [start|stop|restart] invokeai`
 
 **Vast.​ai**
 
-- [A1111 WebUI:latest](https://link.ai-dock.org/template-vast-invokeai)
-
-- [A1111 WebUI:latest-jupyter](https://link.ai-dock.org/template-vast-invokeai-jupyter)
+- [InvokeAI:latest](https://link.ai-dock.org/template-vast-invokeai)
 
 ---
 
 **Runpod.​io**
 
-- [A1111 WebUI:latest](https://link.ai-dock.org/template-runpod-invokeai)
-
-- [A1111 WebUI:latest-jupyter](https://link.ai-dock.org/template-runpod-invokeai-jupyter)
+- [InvokeAI:latest](https://link.ai-dock.org/template-runpod-invokeai)
 
 ---
 
