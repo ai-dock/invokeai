@@ -98,14 +98,11 @@ function build_extra_start() {
     done
 
     pkill invokeai-web
-
-    # Ensure pytorch hasn't been clobbered
-    $MAMBA_DEFAULT_RUN python /opt/ai-dock/tests/assert-torch-version.py || exit 1
 }
 
 function build_extra_get_mamba_packages() {
     if [[ -n $MAMBA_PACKAGES ]]; then
-        $MAMBA_INSTALL -n invokeai ${MAMBA_PACKAGES[@]}
+        micromamba install -n invokeai -y ${MAMBA_PACKAGES[@]}
     fi
 }
 

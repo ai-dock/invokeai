@@ -1,11 +1,20 @@
 # For build automation - Allows building from any ai-dock base image
 # Use a *cuda*base* image as default because pytorch brings the libs
-ARG IMAGE_BASE="ghcr.io/ai-dock/pytorch:2.1.1-py3.10-cuda-11.8.0-base-22.04"
+ARG IMAGE_BASE="ghcr.io/ai-dock/python:3.10-cuda-11.8.0-base-22.04"
 FROM ${IMAGE_BASE}
 
 LABEL org.opencontainers.image.source https://github.com/ai-dock/invokeai
-LABEL org.opencontainers.image.description "AI-Dock + Invoke AI docker image"
+LABEL org.opencontainers.image.description "InvokeAI docker images for use in GPU cloud and local environments. Includes AI-Dock base for authentication and improved user experience."
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
+
+ARG PYTHON_VERSION="3.10"
+ENV PYTHON_VERSION="${PYTHON_VERSION}"
+
+ARG PYTORCH_VERSION="2.2.2"
+ENV PYTORCH_VERSION="${PYTORCH_VERSION}"
+
+ARG INVOKEAI_VERSION
+ENV INVOKEAI_VERSION=${INVOKEAI_VERSION}
 
 ENV IMAGE_SLUG="invokeai"
 ENV OPT_SYNC=invokeai

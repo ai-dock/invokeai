@@ -1,6 +1,5 @@
 #!/bin/bash
 umask 002
-branch=master
 
 if [[ -n "${INVOKEAI_VERSION}" ]]; then
     version="${INVOKEAI_VERSION}"

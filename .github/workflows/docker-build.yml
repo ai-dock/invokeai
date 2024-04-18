@@ -2,28 +2,22 @@ name: Docker Build
 
 on:
   workflow_dispatch:
-  push:
-    branches: [ "main" ]
+  #push:
+  #  branches: [ "main" ]
     
 env:
   UBUNTU_VERSION: 22.04
   BUILDX_NO_DEFAULT_ATTESTATIONS: 1
-  LATEST_CUDA: "pytorch-2.2.1-py3.10-cuda-11.8.0-runtime-22.04"
-  LATEST_ROCM: "pytorch-2.2.1-py3.10-rocm-5.7-runtime-22.04"
-  LATEST_CPU: "pytorch-2.2.1-py3.10-cpu-22.04"
-
+  
 jobs:
   cpu-base:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        base:
-          - "jupyter-pytorch"
-        python:
-          - "3.10"
-        pytorch:
-          - "2.2.1"
+        build:
+          - {latest: "true", invokeai: "4.1.0", python: "3.10", pytorch: "2.2.2"}
+          - {latest: "false", invokeai: "4.1.0", python: "3.10", pytorch: "2.2.2"}
     steps:
       -
         name: Free Space
@@ -59,23 +53,32 @@ jobs:
       -
         name: Set tags
         run: |
-          img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="pytorch-${{ matrix.pytorch }}-py${{ matrix.python }}-cpu-${{ env.UBUNTU_VERSION }}"
-          
-          if [[ $ver_tag == ${{ env.LATEST_CPU }} ]]; then
-              TAGS="${img_path}:latest-cpu, ${img_path}:$ver_tag"
-          else
-              TAGS="${img_path}:$ver_tag"
-          fi
-          echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
+            img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
+
+            INVOKEAI_VERSION=${{ matrix.build.invokeai }}
+            [ -z "$INVOKEAI_VERSION" ] && { echo "Error: INVOKEAI_VERSION is empty. Exiting script." >&2; exit 1; }
+            echo "INVOKEAI_VERSION=${INVOKEAI_VERSION}" >> ${GITHUB_ENV}
+
+            base_tag="cpu-${{ env.UBUNTU_VERSION }}"
+
+            if [[ ${{ matrix.build.latest }} == "true" ]]; then
+                echo "Marking latest"
+                TAGS="${img_path}:${base_tag}, ${img_path}:latest-cpu, ${img_path}:latest-cpu-jupyter"
+            else
+                TAGS="${img_path}:${base_tag}-v${INVOKEAI_VERSION}"
+            fi
+            echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
         name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: build
           build-args: |
-            IMAGE_BASE=ghcr.io/ai-dock/${{ matrix.base }}:${{ matrix.pytorch }}-py${{ matrix.python }}-cpu-${{ env.UBUNTU_VERSION }}
-          push: true
+            IMAGE_BASE=ghcr.io/ai-dock/python:${{ matrix.build.python }}-cpu-${{ env.UBUNTU_VERSION }}
+            PYTHON_VERSION=${{ matrix.build.python }}
+            PYTORCH_VERSION=${{ matrix.build.pytorch }}
+            INVOKEAI_VERSION=${{ env.INVOKEAI_VERSION }}
+            push: true
           # Avoids unknown/unknown architecture and extra metadata
           provenance: false
           tags: ${{ env.TAGS }}
@@ -85,17 +88,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base:
-          - "jupyter-pytorch"
-        python:
-          - "3.10"
-        pytorch:
-          - "2.2.1"
-        cuda:
-          - "11.8.0"
-          - "12.1.0"
-        level:
-          - "runtime"
+        build:
+          - {latest: "true", invokeai: "4.1.0", python: "3.10", pytorch: "2.2.2", cuda: "11.8.0-runtime"}
+          - {latest: "false", invokeai: "4.1.0", python: "3.10", pytorch: "2.2.2", cuda: "12.1.1-runtime"}
 
     steps:
       -
@@ -132,23 +127,31 @@ jobs:
       -
         name: Set tags
         run: |
-          img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="pytorch-${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
-          
-          if [[ $ver_tag == ${{ env.LATEST_CUDA }} ]]; then
-              TAGS="${img_path}:latest, ${img_path}:latest-cuda, ${img_path}:$ver_tag"
-          else
-              TAGS="${img_path}:$ver_tag"
-          fi
-          echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
+            img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
+            
+            INVOKEAI_VERSION=${{ matrix.build.invokeai }}
+            [ -z "$INVOKEAI_VERSION" ] && { echo "Error: INVOKEAI_VERSION is empty. Exiting script." >&2; exit 1; }
+            echo "INVOKEAI_VERSION=${INVOKEAI_VERSION}" >> ${GITHUB_ENV}
+
+            base_tag="cuda-${{ matrix.build.cuda }}-${{ env.UBUNTU_VERSION }}"
+
+            if [[ ${{ matrix.build.latest }} == "true" ]]; then
+                echo "Marking latest"
+                TAGS="${img_path}:${base_tag}, ${img_path}:latest, ${img_path}:latest-cuda"
+            else
+                TAGS="${img_path}:${base_tag}-v${INVOKEAI_VERSION}"
+            fi
+            echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
         name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: build
           build-args: |
-            IMAGE_BASE=ghcr.io/ai-dock/${{ matrix.base }}:${{ matrix.pytorch }}-py${{ matrix.python }}-cuda-${{ matrix.cuda }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}
-            PYTORCH_VERSION=${{ matrix.pytorch }}
+            IMAGE_BASE=ghcr.io/ai-dock/python:${{ matrix.build.python }}-cuda-${{ matrix.build.cuda }}-${{ env.UBUNTU_VERSION }}
+            PYTHON_VERSION=${{ matrix.build.python }}
+            PYTORCH_VERSION=${{ matrix.build.pytorch }}
+            INVOKEAI_VERSION=${{ env.INVOKEAI_VERSION }}
           push: true
           provenance: false
           tags: ${{ env.TAGS }}
@@ -158,16 +161,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        base:
-          - "jupyter-pytorch"
-        python:
-          - "3.10"
-        pytorch:
-          - "2.2.1"
-        rocm:
-          - "5.7"
-        level:
-          - "runtime"
+        build:
+          - {latest: "true", invokeai: "4.1.0", python: "3.10", pytorch: "2.2.2", rocm: "5.7-runtime"}
+          - {latest: "false", invokeai: "4.1.0", python: "3.10", pytorch: "2.2.2", rocm: "5.7-runtime"}
     steps:
       -
         name: Free Space
@@ -203,22 +199,31 @@ jobs:
       -
         name: Set tags
         run: |
-          img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
-          ver_tag="pytorch-${{ matrix.pytorch }}-py${{ matrix.python }}-rocm-${{ matrix.rocm }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}"
-          
-          if [[ $ver_tag == ${{ env.LATEST_ROCM }} ]]; then
-              TAGS="${img_path}:latest-rocm, ${img_path}:$ver_tag"
-          else
-              TAGS="${img_path}:$ver_tag"
-          fi
-          echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
+            img_path="ghcr.io/${{ env.PACKAGE_NAME }}"
+            
+            INVOKEAI_VERSION=${{ matrix.build.invokeai }}
+            [ -z "$INVOKEAI_VERSION" ] && { echo "Error: INVOKEAI_VERSION is empty. Exiting script." >&2; exit 1; }
+            echo "INVOKEAI_VERSION=${INVOKEAI_VERSION}" >> ${GITHUB_ENV}
+
+            base_tag="rocm-${{ matrix.build.rocm }}-${{ env.UBUNTU_VERSION }}"
+
+            if [[ ${{ matrix.build.latest }} == "true" ]]; then
+                echo "Marking latest"
+                TAGS="${img_path}:${base_tag}, ${img_path}:latest-rocm"
+            else
+                TAGS="${img_path}:${base_tag}-v${INVOKEAI_VERSION}"
+            fi
+            echo "TAGS=${TAGS}" >> ${GITHUB_ENV}
       -
         name: Build and push
         uses: docker/build-push-action@v4
         with:
           context: build
           build-args: |
-            IMAGE_BASE=ghcr.io/ai-dock/${{ matrix.base }}:${{ matrix.pytorch }}-py${{ matrix.python }}-rocm-${{ matrix.rocm }}-${{ matrix.level }}-${{ env.UBUNTU_VERSION }}
+            IMAGE_BASE=ghcr.io/ai-dock/python:${{ matrix.build.python }}-rocm-${{ matrix.build.rocm }}-${{ env.UBUNTU_VERSION }}
+            PYTHON_VERSION=${{ matrix.build.python }}
+            PYTORCH_VERSION=${{ matrix.build.pytorch }}
+            INVOKEAI_VERSION=${{ env.INVOKEAI_VERSION }}
           push: true
           provenance: false
           tags: ${{ env.TAGS }}
