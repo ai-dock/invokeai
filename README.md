@@ -23,26 +23,26 @@ The `:latest` tag points to `:latest-cuda`
 Tags follow these patterns:
 
 ##### _CUDA_
-- `:pytorch-[pytorch-version]-py[python-version]-cuda-[x.x.x]-base-[ubuntu-version]`
+- `:v2-cuda-[x.x.x]-runtime-[ubuntu-version]-[invokeai-version]`
 
-- `:latest-cuda` &rarr; `:pytorch-2.2.1-py3.10-cuda-11.8.0-base-22.04`
+- `:latest-cuda` &rarr; `:v2-cuda-11.8.0-base-22.04-v4.2.4`
 
 ##### _ROCm_
-- `:pytorch-[pytorch-version]-py[python-version]-rocm-[x.x.x]-runtime-[ubuntu-version]`
+- `:v2-rocm-[x.x.x]-runtime-[ubuntu-version]-[invokeai-version]`
 
-- `:latest-rocm` &rarr; `:pytorch-2.2.1-py3.10-rocm-5.7-runtime-22.04`
+- `:latest-rocm` &rarr; `:v2-rocm-5.7-runtime-22.04-v4.2.4`
 
 ##### _CPU_
-- `:pytorch-[pytorch-version]-py[python-version]-ubuntu-[ubuntu-version]`
+- `:v2-cpu-[ubuntu-version]-[invokeai-version]`
 
-- `:latest-cpu` &rarr; `:pytorch-2.2.1-py3.10-cpu-22.04` 
+- `:latest-cpu` &rarr; `:v2-cpu-22.04-v4.2.4` 
 
 
 Browse [here](https://github.com/ai-dock/invokeai/pkgs/container/invokeai) for an image suitable for your target environment.
 
 Supported Python versions: `3.10`
 
-Supported Pytorch versions: `2.2.1`
+Supported Pytorch versions: `2.2.2`
 
 Supported Platforms: `NVIDIA CUDA`, `AMD ROCm`, `CPU`
 
@@ -58,15 +58,15 @@ Supported Platforms: `NVIDIA CUDA`, `AMD ROCm`, `CPU`
 
 See the base environment variables [here](https://github.com/ai-dock/base-image/wiki/2.0-Environment-Variables) for more configuration options.
 
-### Additional Micromamba Environments
+### Additional Python Environments
 
 | Environment    | Packages |
 | -------------- | ----------------------------------------- |
 | `invokeai`     | Invoke AI and dependencies |
 
-This micromamba environment will be activated on shell login.
+This virtualenv will be activated on shell login.
 
-See the base micromamba environments [here](https://github.com/ai-dock/base-image/wiki/1.0-Included-Software#installed-micromamba-environments).
+~~See the base image environments [here](https://github.com/ai-dock/base-image/wiki/1.0-Included-Software#installed-micromamba-environments).~~
 
 
 ## Additional Services

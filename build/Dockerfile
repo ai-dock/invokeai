@@ -7,36 +7,35 @@ LABEL org.opencontainers.image.source https://github.com/ai-dock/invokeai
 LABEL org.opencontainers.image.description "InvokeAI docker images for use in GPU cloud and local environments. Includes AI-Dock base for authentication and improved user experience."
 LABEL maintainer="Rob Ballantyne <rob@dynamedia.uk>"
 
-ARG PYTHON_VERSION="3.10"
-ENV PYTHON_VERSION="${PYTHON_VERSION}"
-
-ARG PYTORCH_VERSION="2.2.2"
-ENV PYTORCH_VERSION="${PYTORCH_VERSION}"
-
-ARG INVOKEAI_VERSION
-ENV INVOKEAI_VERSION=${INVOKEAI_VERSION}
+ENV INVOKEAI_VENV=$VENV_DIR/invokeai
+ENV INVOKEAI_VENV_PYTHON=$INVOKEAI_VENV/bin/python
+ENV INVOKEAI_VENV_PIP=$INVOKEAI_VENV/bin/pip
 
 ENV IMAGE_SLUG="invokeai"
 ENV OPT_SYNC=invokeai
 
-ENV INVOKEAI_ROOT="/opt/invokeai"
-
-# Copy early so we can use scripts in the build - Changes to these files will invalidate the cache and cause a rebuild.
-COPY --chown=0:1111 ./COPY_ROOT/ /
-
-# Use build scripts to ensure we can build all targets from one Dockerfile in a single layer.
-# Don't put anything heavy in here - We can use multi-stage building above if necessary.
-
+# Prepare environment
+ARG PYTHON_VERSION="3.10"
+ENV PYTHON_VERSION="${PYTHON_VERSION}"
+ARG PYTORCH_VERSION="2.2.2"
+ENV PYTORCH_VERSION="${PYTORCH_VERSION}"
+COPY --chown=0:1111 ./COPY_ROOT_0/ /
 ARG IMAGE_BASE
 RUN set -eo pipefail && /opt/ai-dock/bin/build/layer0/init.sh | tee /var/log/build.log
 
-# Must be set after layer0
-ENV MAMBA_DEFAULT_ENV=invokeai
-ENV MAMBA_DEFAULT_RUN="micromamba run -n ${MAMBA_DEFAULT_ENV}"
+# Install software
+ENV INVOKEAI_ROOT="/opt/invokeai"
+ARG INVOKEAI_VERSION
+ENV INVOKEAI_VERSION=${INVOKEAI_VERSION}
+COPY --chown=0:1111 ./COPY_ROOT_1/ /
+ARG IMAGE_BASE
+RUN set -eo pipefail && /opt/ai-dock/bin/build/layer1/init.sh | tee -a /var/log/build.log
 
 # Copy overrides and models into later layers for fast rebuilds
-COPY --chown=0:1111 ./COPY_ROOT_EXTRA/ /
-RUN set -eo pipefail && /opt/ai-dock/bin/build/layer1/init.sh | tee -a /var/log/build.log
+COPY --chown=0:1111 ./COPY_ROOT_99/ /
+RUN set -eo pipefail && /opt/ai-dock/bin/build/layer99/init.sh | tee -a /var/log/build.log
+
+ENV PYTHON_DEFAULT_VENV=invokeai
 
 # Keep init.sh as-is and place additional logic in /opt/ai-dock/bin/preflight.sh
 CMD ["init.sh"]

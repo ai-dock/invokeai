@@ -10,9 +10,16 @@ QUICKTUNNELS=true
 function cleanup() {
     kill $(jobs -p) > /dev/null 2>&1
     rm /run/http_ports/$PROXY_PORT > /dev/null 2>&1
+    if [[ -z "$VIRTUAL_ENV" ]]; then
+        deactivate
+    fi
 }
 
 function start() {
+    source /opt/ai-dock/etc/environment.sh
+    source /opt/ai-dock/bin/venv-set.sh serviceportal
+    source /opt/ai-dock/bin/venv-set.sh invokeai
+
     if [[ ! -v WEBUI_PORT || -z $WEBUI_PORT ]]; then
         INVOKEAI_PORT=${INVOKEAI_PORT_HOST:-9090}
     fi
@@ -38,7 +45,7 @@ function start() {
     if [[ -f /run/workspace_sync || -f /run/container_config ]]; then
         fuser -k -SIGTERM ${LISTEN_PORT}/tcp > /dev/null 2>&1 &
         wait -n
-        /usr/bin/python3 /opt/ai-dock/fastapi/logviewer/main.py \
+        "$SERVICEPORTAL_VENV_PYTHON" /opt/ai-dock/fastapi/logviewer/main.py \
             -p $LISTEN_PORT \
             -r 5 \
             -s "${SERVICE_NAME}" \
@@ -65,8 +72,8 @@ function start() {
     # InvokeAI fails to start when the invoke dir is owned by root despite our loose permissions
     sudo find "$(readlink -f /opt/invokeai)" -not -user "$USER_NAME" -exec chown "${USER_NAME}.${USER_NAME}" {} \;
 
-    cd /opt/invokeai
-    micromamba run -n invokeai -e LD_PRELOAD=libtcmalloc.so invokeai-web
+    source "$INVOKEAI_VENV/bin/activate"
+    LD_PRELOAD=libtcmalloc.so invokeai-web
 }
 
 start 2>&1

@@ -18,7 +18,7 @@ done
 printf "Updating InvokeAI (${version:-latest})...\n"
 
 # Pin Torch to our image version
-micromamba run -n invokeai ${PIP_INSTALL} --use-pep517 \
+$INVOKEAI_VENV_PIP install --no-cache-dir --use-pep517 \
   torch==${PYTORCH_VERSION} \
   InvokeAI${version+==$version}
   

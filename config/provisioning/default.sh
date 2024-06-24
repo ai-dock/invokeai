@@ -10,11 +10,6 @@
 ### Edit the following arrays to suit your workflow - values must be quoted and separated by newlines or spaces.
 
 DISK_GB_REQUIRED=30
-
-MAMBA_PACKAGES=(
-    #"package1"
-    #"package2=version"
-  )
   
 PIP_PACKAGES=(
     #"bitsandbytes==0.41.2.post2"
@@ -75,7 +70,6 @@ function provisioning_start() {
     DISK_GB_USED=$(($(df --output=used -m "${WORKSPACE}" | tail -n1) / 1000))
     DISK_GB_ALLOCATED=$(($DISK_GB_AVAILABLE + $DISK_GB_USED))
     provisioning_print_header
-    provisioning_get_mamba_packages
     provisioning_get_pip_packages
     provisioning_get_nodes
     provisioning_get_models \
@@ -97,15 +91,9 @@ function provisioning_start() {
     provisioning_print_end
 }
 
-function provisioning_get_mamba_packages() {
-    if [[ -n $MAMBA_PACKAGES ]]; then
-        $MAMBA_INSTALL -n invokeai ${MAMBA_PACKAGES[@]}
-    fi
-}
-
 function provisioning_get_pip_packages() {
     if [[ -n $PIP_PACKAGES ]]; then
-        micromamba run -n invokeai $PIP_INSTALL ${PIP_PACKAGES[@]}
+        $INVOKEAI_VENV_PIP install --no-cache-dir ${PIP_PACKAGES[@]}
     fi
 }
 
@@ -119,14 +107,14 @@ function provisioning_get_nodes() {
                 printf "Updating extension: %s...\n" "${repo}"
                 ( cd "$path" && git pull )
                 if [[ -e $requirements ]]; then
-                    micromamba -n invokeai run ${PIP_INSTALL} -r "$requirements"
+                    $INVOKEAI_VENV_PIP install --no-cache-dir -r "$requirements"
                 fi
             fi
         else
             printf "Downloading node: %s...\n" "${repo}"
             git clone "${repo}" "${path}" --recursive
             if [[ -e $requirements ]]; then
-                micromamba -n invokeai run ${PIP_INSTALL} -r "${requirements}"
+                $INVOKEAI_VENV_PIP install --no-cache-dir -r "${requirements}"
             fi
         fi
     done

@@ -3,11 +3,6 @@ set -eo pipefail
 
 # Use this layer to add nodes and models
 
-MAMBA_PACKAGES=(
-    #"package1"
-    #"package2=version"
-  )
-  
 PIP_PACKAGES=(
     #"package1==version"
     #"package2"
@@ -65,7 +60,6 @@ CONTROLNET_MODELS=(
 
 function build_extra_start() {
     source /opt/ai-dock/etc/environment.sh
-    build_extra_get_mamba_packages
     build_extra_get_pip_packages
     build_extra_get_nodes
     build_extra_get_models \
@@ -85,30 +79,31 @@ function build_extra_start() {
         "${ESRGAN_MODELS[@]}"
 
     # Invoke has no exit/CI run mode so run it and wait until it's fuly initialised
-    cd /opt/invokeai && \
-        micromamba run -n invokeai -e LD_PRELOAD=libtcmalloc.so invokeai-web 2>&1 | tee /tmp/invoke-ci.log &
+    source "$INVOKEAI_VENV/bin/activate"
+    LD_PRELOAD=libtcmalloc.so invokeai-web 2>&1 | tee /tmp/invoke-ci.log &
     wait_max=30
     wait_current=0
     init_string="Uvicorn running on"
 
     # Until loop to continuously check if the string is found or maximum wait time is reached
-    until grep -qi "$init_string" /tmp/invoke-ci.log; do
-        printf "Waiting for InvokeAI initialization to complete...\n"
-        sleep 1
+    while [ $wait_current -lt $wait_max ]; do
+        if grep -qi "$init_string" /tmp/invoke-ci.log; then
+            echo "InvokeAI initialization complete."
+            break
+        else
+            echo "Waiting for InvokeAI initialization to complete..."
+            sleep 1
+            wait_current=$((wait_current + 1))
+        fi
     done
 
     pkill invokeai-web
-}
-
-function build_extra_get_mamba_packages() {
-    if [[ -n $MAMBA_PACKAGES ]]; then
-        micromamba install -n invokeai -y ${MAMBA_PACKAGES[@]}
-    fi
+    deactivate
 }
 
 function build_extra_get_pip_packages() {
     if [[ -n $PIP_PACKAGES ]]; then
-        micromamba run -n invokeai $PIP_INSTALL ${PIP_PACKAGES[@]}
+        $INVOKEAI_VENV_PIP install --no-cache-dir ${PIP_PACKAGES[@]}
     fi
 }
 
@@ -122,14 +117,14 @@ function build_extra_get_nodes() {
                 printf "Updating node: %s...\n" "${repo}"
                 ( cd "$path" && git pull )
                 if [[ -e $requirements ]]; then
-                    micromamba -n invokeai run ${PIP_INSTALL} -r "$requirements"
+                    $INVOKEAI_VENV_PIP install --no-cache-dir -r "$requirements"
                 fi
             fi
         else
             printf "Downloading node: %s...\n" "${repo}"
             git clone "${repo}" "${path}" --recursive
             if [[ -e $requirements ]]; then
-                micromamba -n invokeai run ${PIP_INSTALL} -r "${requirements}"
+                $INVOKEAI_VENV_PIP install --no-cache-dir -r "${requirements}"
             fi
         fi
     done
