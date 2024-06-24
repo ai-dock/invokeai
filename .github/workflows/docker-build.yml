@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "false", invokeai: "4.2.4", python: "3.10", pytorch: "2.2.2"}
+          - {latest: "true", invokeai: "4.2.4", python: "3.10", pytorch: "2.2.2"}
     steps:
       -
         name: Free Space
@@ -88,7 +88,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "false", invokeai: "4.2.4", python: "3.10", pytorch: "2.2.2", cuda: "11.8.0-base"}
+          - {latest: "true", invokeai: "4.2.4", python: "3.10", pytorch: "2.2.2", cuda: "11.8.0-base"}
           
     steps:
       -
@@ -160,7 +160,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "false", invokeai: "4.2.4", python: "3.10", pytorch: "2.2.2", rocm: "6.0-core"}
+          - {latest: "true", invokeai: "4.2.4", python: "3.10", pytorch: "2.2.2", rocm: "6.0-core"}
     steps:
       -
         name: Free Space
@@ -206,7 +206,7 @@ jobs:
 
             if [[ ${{ matrix.build.latest }} == "true" ]]; then
                 echo "Marking latest"
-                TAGS="${img_path}:${base_tag}, ${img_path}:latest-rocm"
+                TAGS="${img_path}:${base_tag}-v${INVOKEAI_VERSION}, ${img_path}:${base_tag}, ${img_path}:latest-rocm"
             else
                 TAGS="${img_path}:${base_tag}-v${INVOKEAI_VERSION}"
             fi
