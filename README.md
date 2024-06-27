@@ -25,17 +25,17 @@ Tags follow these patterns:
 ##### _CUDA_
 - `:v2-cuda-[x.x.x]-runtime-[ubuntu-version]-[invokeai-version]`
 
-- `:latest-cuda` &rarr; `:v2-cuda-11.8.0-base-22.04-v4.2.4`
+- `:latest-cuda` &rarr; `:v2-cuda-11.8.0-base-22.04-v4.2.5`
 
 ##### _ROCm_
 - `:v2-rocm-[x.x.x]-runtime-[ubuntu-version]-[invokeai-version]`
 
-- `:latest-rocm` &rarr; `:v2-rocm-5.7-runtime-22.04-v4.2.4`
+- `:latest-rocm` &rarr; `:v2-rocm-5.7-runtime-22.04-v4.2.5`
 
 ##### _CPU_
 - `:v2-cpu-[ubuntu-version]-[invokeai-version]`
 
-- `:latest-cpu` &rarr; `:v2-cpu-22.04-v4.2.4` 
+- `:latest-cpu` &rarr; `:v2-cpu-22.04-v4.2.5` 
 
 
 Browse [here](https://github.com/ai-dock/invokeai/pkgs/container/invokeai) for an image suitable for your target environment.
@@ -89,7 +89,9 @@ To manage this service you can use `supervisorctl [start|stop|restart] invokeai`
 
 **Vast.​ai**
 
-- [InvokeAI:latest](https://link.ai-dock.org/template-vast-invokeai)
+- [InvokeAI:latest-cuda](https://link.ai-dock.org/template-vast-invokeai)
+
+- [InvokeAI:latest-rocm](https://link.ai-dock.org/template-vast-invokeai-rocm)
 
 ---
 
