@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "true", invokeai: "4.2.5", python: "3.10", pytorch: "2.2.2"}
+          - {latest: "false", invokeai: "4.2.7", python: "3.10", pytorch: "2.2.2"}
     steps:
       -
         name: Free Space
@@ -88,7 +88,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "true", invokeai: "4.2.5", python: "3.10", pytorch: "2.2.2", cuda: "11.8.0-base"}
+          - {latest: "false", invokeai: "4.2.7", python: "3.10", pytorch: "2.2.2", cuda: "12.1.1-base"}
           
     steps:
       -
@@ -160,7 +160,7 @@ jobs:
       fail-fast: false
       matrix:
         build:
-          - {latest: "true", invokeai: "4.2.5", python: "3.10", pytorch: "2.2.2", rocm: "5.7-core"}
+          - {latest: "false", invokeai: "4.2.7", python: "3.10", pytorch: "2.2.2", rocm: "5.7-core"}
     steps:
       -
         name: Free Space
